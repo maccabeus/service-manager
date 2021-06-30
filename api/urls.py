@@ -38,7 +38,7 @@ urlpatterns = [
     # search the workorder using either ``id``
     path('workorder/search/date', api_views.workorder_search_by_date_range),
     # search the workorder using  ``date range``
-    path('workorder/delete', api_views.workorder_search_by_date_range),
+    path('workorder/delete', api_views.workorder_delete),
     # search the workorder using  ``date range``
     
 ]

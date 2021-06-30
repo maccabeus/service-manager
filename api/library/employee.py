@@ -26,3 +26,11 @@ class EmployeeManager :
                 return Utilities.response_formatter(False, "Employee Record Found", employee_serializer.data)
             except:
                 return Utilities.response_formatter(True, "Error occurs. Please try again")
+    
+    def get_available_employee_id():
+            """
+            Get  any available free employee that can be assign to a work order
+            """
+            return 2
+
+    

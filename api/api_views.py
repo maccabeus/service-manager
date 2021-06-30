@@ -15,10 +15,6 @@ from api.library.workorder import WorkOrderManager
 def service(request):
     """
     Return the list of available services 
-
-    Args:
-        request (Request): [http request object ]
-
     Returns:
         [json]: [returns a jason string]
     """
@@ -31,7 +27,6 @@ def service_by_id(request, service_id: int):
     """[Get service by ID]
 
     Args:
-        request ([type]): [http request object]
         service_id (int): [the id of the service. ``pk``]
 
     Returns:
@@ -48,9 +43,6 @@ def service_by_id(request, service_id: int):
 def customer(request: Request):
     """Return the list of available customers
 
-    Args:
-        request (Request): [description]
-
     Returns:
         [json]: [returns a jason string]
     """
@@ -63,11 +55,10 @@ def customer_get_by_email(request: Request, email: str):
     """Get a customer details  by email
 
     Args:
-        request (Request): [description]
-        email (str): [description]
+        email (str): [customer's email address]
 
     Returns:
-        [type]: [description]
+        [json]: [returns a jason string]
     """
     customer_manager = CustomerManager
     return Response(customer_manager.getByEmail(request, email))
@@ -78,10 +69,7 @@ def customer_get_by_email(request: Request, email: str):
 
 @api_view(['GET'])
 def holiday(request: Request):
-    """Get the list of available holidays
-
-    Args:
-         request (Request): [http request object ]
+    """Get the list of available holiday
 
     Returns:
         [json]: [returns a jason string]
@@ -95,8 +83,7 @@ def holiday_by_id(request, holiday_id: int):
     """[Get holiday using the provided ``holiday_id``]
 
     Args:
-        request ([object]): [http request object]
-        service_id (int): [the  id of the holiday provided]
+        holiday_id (int): [the  id of the holiday provided]
 
     Returns:
         [type]: [http response object]
@@ -112,9 +99,6 @@ def holiday_by_id(request, holiday_id: int):
 def employee(request: Request):
     """Get list of employees
 
-    Args:
-         request (Request): [http request object ]
-
     Returns:
         [json]: [returns a jason string]
     """
@@ -127,8 +111,7 @@ def employee_by_id(request, employee_id: int):
     """[Returns the employee with the provided  ``employee_id``]
 
     Args:
-        request ([object]): [http request object]
-        service_id (int): [the  id of the holiday provided]
+        employee_id (int): [the  id of the holiday provided]
 
     Returns:
         [type]: [http response object]
@@ -141,11 +124,12 @@ def employee_by_id(request, employee_id: int):
 # ----------------------------------------------------------------------------------
 
 @api_view(['POST'])
-def workorder_add(request: Request):
+def workorder_add(request):
     """Add a new work order 
 
     Args:
-         request (Request): [http request object ]
+         email (str): [customers email address ]
+         service_id (int): [Service id to schedule]
 
     Returns:
         [json]: [returns a jason string]
@@ -157,10 +141,11 @@ def workorder_add(request: Request):
 def workorder_search(request: Request):
     """
     Search the list work orders and find an order either 
-    By ``id`` or by the provided ``date range``
+    By ``id`` or by the provided ``email``
 
     Args:
-         request (Request): [http request object ]
+            email (str): [customers email address ]
+            service_id (int): [optiona - service id  ]
 
     Returns:
         [json]: [returns a jason string]
@@ -174,7 +159,10 @@ def workorder_search_by_date_range(request: Request):
     Search the list of work orders by the provided ``date range``
 
     Args:
-         request (Request): [http request object ]
+        email (str): [customers email address ]
+        date_from (str): [start date range ]
+        date_to (str): [end date range ]
+        service_id (int): [optiona - service id  ]
 
     Returns:
         [json]: [returns a jason string]
@@ -188,12 +176,11 @@ def workorder_delete(request):
     Delete a work order service request
 
     Args:
-         email (str): [the customer email addres ]
-         service_id (int): [the service ID of the requested service ]
-         request_id (int): [the request ID  ]
+         id (int): [the request ID  ]
+         forced (int): [optional - will delete completely from system. Must be use for admin purposes. Slot cannot be reassigned if this param is used ]
 
     Returns:
         [json]: [returns a jason string]
     """
     order_manager = WorkOrderManager
-    return Response(order_manager.add_order(request))
+    return Response(order_manager.delete_order(request))

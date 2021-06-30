@@ -74,7 +74,6 @@ class Service (models.Model):
     updated_at = models.DateTimeField(
         null=True, verbose_name="date and time service is updated")
 
-
 class WorkOrder(models.Model):
 
     """ 
@@ -84,22 +83,20 @@ class WorkOrder(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=['date_created']),
-            models.Index(fields=['customer_email']),
+            models.Index(fields=['customer_id']),
             models.Index(fields=['deleted']),
             models.Index(fields=['done']),
             models.Index(fields=['id']),
-            models.Index(fields=['start_time']),
-            models.Index(fields=['end_time']),
+            models.Index(fields=['start_time_value']),
+            models.Index(fields=['end_time_value']),
         ]
 
     service_id = models.BigIntegerField(
         verbose_name="the service Id linked to this order")
-    customer_id = models.BigIntegerField(
-        verbose_name="the customer Id linked to this order")
     employee_id = models.BigIntegerField(
         verbose_name="the emplyee Id assigned to treat this order")
     description = models.TextField(help_text="The order descriptions")
-    customer_email = models.EmailField(
+    customer_id = models.EmailField(
         max_length=100, help_text="The customer's email address", default="")
     duration = models.FloatField(
         verbose_name="The duration in minues required for task completion")
@@ -107,8 +104,13 @@ class WorkOrder(models.Model):
         auto_now_add=True, verbose_name="date order is created")
     time_created = models.TimeField(
         auto_now_add=True, verbose_name="time order is created")
-    start_time = models.TimeField(verbose_name="The actual time the order is scheduled to start", default= None)
-    end_time = models.TimeField(verbose_name="The time the order is scheduled to end", default= None)
+
+    start_time = models.CharField( max_length=100, verbose_name="The actual time the order is scheduled to start",  default=None)
+    end_time = models.CharField( max_length=100, verbose_name="The time the order is scheduled to end", default = None)
+
+    start_time_value = models.FloatField(verbose_name="number representation of starr time",  default=None)
+    end_time_value = models.FloatField(verbose_name="number representation of end time",  default= None)
+
     updated_at = models.DateTimeField(
         null=True, verbose_name="date and time order is updated")
     done = models.BigIntegerField(

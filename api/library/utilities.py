@@ -35,3 +35,24 @@ class Utilities:
         """
 
         return ({'error': False, 'message':message_found, 'data':response_object.data})
+
+    def is_slot_within_closing_hour(closing_hour, slot_end_time, multiplier=10000):
+        """
+        check if the ``slot_end_time`` is still within the ``closing_hour`` range
+
+        if not, this work order must be schedule for the next day and we cannot alot time
+        """
+        if float(closing_hour) > 0:
+            closing_hour_value= float(closing_hour) * multiplier
+            # convers hour base. Since this is not . Note this is in hhmmss
+        else:
+            closing_hour_value= 0
+
+        valid= (float(closing_hour_value) > float(slot_end_time))
+
+        # print(closing_hour_value, "closing")
+        # print(slot_end_time, "slot end")
+
+        return valid
+        # returns ``True`` if we still have time for schedule assignmen
+
