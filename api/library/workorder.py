@@ -15,17 +15,22 @@ class WorkOrderManager:
 
         email = request.GET.get('email')
         # the customer's email.
-        service_id = request.GET.get('service_id')
 
-        if(email == None or service_id == None):
+        service_id = request.GET.get('service_id')
+        # optional service_id parameter. We will also use if provided
+
+        if(email == None):
             """
             for each search request, the customer email must be provided
             """
-            return Utilities.response_formatter(True, "email and service_id must be provided")
+            return Utilities.response_formatter(True, "email  must be provided")
 
         try:
-            orders = WorkOrder.objects.filter(
-                service_id=service_id, customer_id=email)
+            if(service_id) :
+                orders = WorkOrder.objects.filter(service_id=service_id, customer_id=email)
+            else:
+                orders = WorkOrder.objects.filter(customer_id=email)
+
             """
             search service schedules using only the service_id
             this is the ``service_id`` previously issued to the customer
@@ -48,11 +53,6 @@ class WorkOrderManager:
         Search work order using the date range provided. both ``date_from`` and ``date_to``
         must be provided for this to work as we search through the date ranges
 
-        Args:
-            request ([object]): [http request object]
-
-        Returns:
-            [object]: [http response object]
         """
 
         email = request.GET.get('email')
@@ -75,30 +75,30 @@ class WorkOrderManager:
             """
             return Utilities.response_formatter(True, "date_from and date_to must be provided")
 
-        # try:
-        """
-        search service schedules using only the email and date range provided
-        """
-        if(service_id != None):
-            orders = WorkOrder.objects.filter(
-                date_created__range=[date_from, date_to], service_id=service_id)
-            # filter also using the ``service_id```
+        try:
+            """
+            search service schedules using only the email and date range provided
+            """
+            if(service_id != None):
+                orders = WorkOrder.objects.filter(
+                    date_created__range=[date_from, date_to], service_id=service_id)
+                # filter also using the ``service_id```
+            else:
+                orders = WorkOrder.objects.filter(
+                    date_created__range=[date_from, date_to])
+                # select model using only the date_from and date_to
 
-        orders = WorkOrder.objects.filter(
-            date_created__range=[date_from, date_to])
-        # select model using only the date_from and date_to
+            if(len(orders) <= 0):
+                # if not work order found, return empty data
+                return Utilities.response_formatter(False, "No work order found for date range", [])
 
-        if(len(orders) <= 0):
-            # if not work order found, return empty data
-            return Utilities.response_formatter(False, "No work order found for date range", [])
+            serialized_orders = WorkOrderSerializer(orders, many=True)
+            # serialize data and return
+            return Utilities.response_formatter(False, "Work order found", serialized_orders.data)
 
-        serialized_orders = WorkOrderSerializer(orders, many=True)
-        # serialize data and return
-        return Utilities.response_formatter(False, "Work order found", serialized_orders.data)
-
-        # #except:
-        #     return Utilities.response_formatter(True, "Erro occurs. Please try again")
-        #     """ an error occurs and we must retry"""
+        except:
+            return Utilities.response_formatter(True, "Erro occurs. Please try again")
+            """ an error occurs and we must retry"""
 
     def add_order(request):
         """
@@ -113,6 +113,9 @@ class WorkOrderManager:
         """
         email = request.data.get('email')
         service_id = request.data.get('service_id')
+
+        current_date_mock = request.data.get('current_date_mock')
+        # value for date mocking . Use only when unit testing
 
         user_timezone = request.data.get('user_timezone')
         # if we provide timezone, this must be same with our orginization timezone
@@ -151,9 +154,14 @@ class WorkOrderManager:
         """ if service details not found, we will stop execution and notify of error"""
         if(len(service_details) <= 0):
             return Utilities.response_formatter(True, "Service details not found. Please ensure you have prodived the correct service_id")
+        
+        if(current_date_mock!=None):
+            current_date = datetime.fromisoformat(current_date_mock)
+            # convert the mock date string to a date object. For test cases
+        else:
+            current_date = datetime.now()
+        # use current date
 
-        current_date = datetime.now()
-        # current_date=datetime.now(pytz.)
         """ 
         we will utilize the server date for service request date consistency
         if timezone is provided, this timezone must be consistent with our app timezone
@@ -161,10 +169,10 @@ class WorkOrderManager:
         if user timezone is different from app timezone, we must convert the user time to app timezone 
         equivalent
         """
-        current_day = current_date.day
+        current_day = current_date.weekday()
         current_hour = current_date.hour
 
-        if(current_day == 0):
+        if(current_day == 6):
             # we cannot schedule service request on a sunday
             return Utilities.response_formatter(error=True, message="Cannot schedule service request on Sunday")
 
@@ -185,10 +193,11 @@ class WorkOrderManager:
         if(len(holiday) > 0):
             holiday_name = holiday.values_list(
                 'description', flat=True).first()
-            return "There is {} holiday on {} ".format(holiday_name, search_date)
+            return Utilities.response_formatter(error=True, message="There is {} holiday on {} ".format(holiday_name, search_date))
+           
 
         service_description = service_details.values_list(
-            'description', flat=True).first()
+            'name', flat=True).first()
         service_duration = service_details.values_list(
             'duration', flat=True).first()
         """
@@ -206,6 +215,10 @@ class WorkOrderManager:
             current_date + timedelta(minutes=float(service_duration)))
         """ Note: service duration is always in minutes"""
         end_time = end_time_date_object.strftime('%H:%M:%S')
+
+        end_date = end_time_date_object.strftime('%Y-%m-%d')
+        # for services that spans beyond a day,we need to provide the end date from the date object
+
         end_time_value = end_time.replace(':', '')
         # the  number equivalent of our end_time
 
@@ -239,6 +252,7 @@ class WorkOrderManager:
                 done=0,
                 start_time=current_time,
                 end_time=end_time,
+                end_date =end_date,
                 start_time_value=current_time_value,
                 end_time_value=end_time_value,
             )
@@ -263,6 +277,8 @@ class WorkOrderManager:
                     'start_time_value', flat=True).first()
                 deleted_schedule_end_time = deleted_schedules.values_list(
                     'end_time', flat=True).first()
+                deleted_schedule_end_date = deleted_schedules.values_list(
+                    'end_date', flat=True).first()
                 deleted_schedule_end_time_value = deleted_schedules.values_list(
                     'end_time_value', flat=True).first()
                 deleted_schedule_duration = deleted_schedules.values_list(
@@ -292,6 +308,7 @@ class WorkOrderManager:
                         start_time=deleted_schedule_start_time,
                         start_time_value=deleted_schedule_start_time_value,
                         end_time=deleted_schedule_end_time,
+                        end_date=deleted_schedule_end_date,
                         end_time_value=deleted_schedule_end_time_value,
                     )
 
@@ -330,6 +347,10 @@ class WorkOrderManager:
                     current_end_time_object= datetime.strptime(current_time, '%H:%M:%S')+timedelta(minutes=service_duration)
                     """ Note: service duration is always in minutes"""
                     end_time = current_end_time_object.strftime('%H:%M:%S')
+
+                    end_date = end_time_date_object.strftime('%Y-%m-%d')
+                    # the end date is needed for services that spans beyond a day
+                    
                     end_time_value = end_time.replace(':', '')
 
                 if(Utilities.is_slot_within_closing_hour(closing_hour=closing_hour, slot_end_time=end_time_value)==False) :
@@ -348,10 +369,11 @@ class WorkOrderManager:
                     start_time=current_time,
                     start_time_value=current_time_value,
                     end_time=end_time,
+                    end_date=end_date,
                     end_time_value=end_time_value,
                 )
 
-                return Utilities.response_formatter(error=True, message="Service request successfully added")
+                return Utilities.response_formatter(error=False, message="Service request successfully added")
     
     def delete_order(request):
         """
@@ -370,7 +392,7 @@ class WorkOrderManager:
 
         if(id == None):
             """ validate inputs all inputs. All are required """
-            return Utilities.response_formatter(True, "email must be provided")
+            return Utilities.response_formatter(True, "id must be provided")
 
         if(float(forced) == 1):
             delete_result = WorkOrder.objects.filter(id=id).delete()

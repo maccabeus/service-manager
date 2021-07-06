@@ -16,7 +16,7 @@ class UtilitiesTest(TestCase):
 
         A customer must not schedule a slot that will extend beyond our closing hour
         """
-        slot_time_value=170000      # this is equivalent to ``17:00:00``  format equiv to ``5:00PM`            
+        slot_time_value=170000     # this is equivalent to ``17:00:00``  format equiv to ``5:00PM`            
 
         valid_slot= Utilities.is_slot_within_closing_hour(closing_hour=self.closing_hour, slot_end_time=slot_time_value)
 
@@ -24,8 +24,13 @@ class UtilitiesTest(TestCase):
 
     def test_response_formatter(self):
         """ 
-        Response formater must contain object must contain ``error``, ``message`` and ``data`` keys and values
+        Response formater must be an  object  containing ``error``, ``message`` and ``data`` keys and values
         """
         formatter_response=Utilities.response_formatter(True, "Test formatter Return")
         # sample response formatter return value Response formatter must return data key all the time
-        self.assertContains(formatter_response, {'error', 'message', 'data'} )
+
+        self.assertIn('error', formatter_response, "Must have error key")
+        self.assertIn('message', formatter_response, "Must have message key")
+        self.assertIn('data', formatter_response, "Must have data key")
+        # asserts dictionary keys
+

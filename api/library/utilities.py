@@ -48,7 +48,7 @@ class Utilities:
         else:
             closing_hour_value= 0
 
-        valid= (float(closing_hour_value) > float(slot_end_time))
+        valid= (float(closing_hour_value) >= float(slot_end_time))
 
         # print(closing_hour_value, "closing")
         # print(slot_end_time, "slot end")

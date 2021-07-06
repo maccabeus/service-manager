@@ -14,7 +14,7 @@ class ServicesManager :
         return all available services application offers
         """
         try:
-            services= Service.objects.all()
+            services= Service.objects.filter(pk__gt=0)
             service_serializer= ServiceSerializer(services , many=True)
             return Utilities.response_formatter(False, "Record Found", service_serializer.data)
         except:

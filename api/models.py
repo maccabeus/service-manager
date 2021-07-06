@@ -107,6 +107,7 @@ class WorkOrder(models.Model):
 
     start_time = models.CharField( max_length=100, verbose_name="The actual time the order is scheduled to start",  default=None)
     end_time = models.CharField( max_length=100, verbose_name="The time the order is scheduled to end", default = None)
+    end_date = models.CharField( max_length=100, verbose_name="The date the service request ends", default = None)
 
     start_time_value = models.FloatField(verbose_name="number representation of starr time",  default=None)
     end_time_value = models.FloatField(verbose_name="number representation of end time",  default= None)
