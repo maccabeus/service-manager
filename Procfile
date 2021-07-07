@@ -1,1 +1,1 @@
-web: gunicorn servicemanager.wsgi.application.wsgi
+web: gunicorn servicemanager.wsgi --log-file
