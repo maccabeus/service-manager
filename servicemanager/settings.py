@@ -1,5 +1,6 @@
 import django_heroku
 from pathlib import Path
+import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -13,9 +14,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-^d!gn!r#$g%-v_rx1cu1x4a#=4(&@sy1h)qh(&1abomg91o-7s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'https://schedule-service-manager.herokuapp.com'
+    'localhost',
+    '127.0.0.1'
+]
 
 
 # Application definition
@@ -122,10 +127,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configure Django App for Heroku.
+# # Configure Django App for Heroku.
 django_heroku.settings(locals())
