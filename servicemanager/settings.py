@@ -77,13 +77,23 @@ WSGI_APPLICATION = 'servicemanager.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
+DATABASES_LOCAL = {
       'default': {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'service_manager',
         'USER': 'service_manager',
         'PASSWORD': 'AN###thony85',
         'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
+}
+DATABASES = {
+      'default': {
+        'ENGINE': 'django.db.backends.mysql', 
+        'NAME': 'antade0_service_manager',
+        'USER': 'antade0_service_manager',
+        'PASSWORD': 'AN###thony85',
+        'HOST': 'mysql.freehostia.com',
         'PORT': '3306',
     }
 }
