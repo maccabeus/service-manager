@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-^d!gn!r#$g%-v_rx1cu1x4a#=4(&@sy1h)qh(&1abomg91o-7s
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    'https://schedule-service-manager.herokuapp.com'
+    'https://service-manager.netlify.app'
     'localhost',
     '127.0.0.1'
 ]
