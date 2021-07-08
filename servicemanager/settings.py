@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-^d!gn!r#$g%-v_rx1cu1x4a#=4(&@sy1h)qh(&1abomg91o-7s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'https://service-manager.netlify.app'
@@ -51,6 +51,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    'https://service-manager.netlify.app',
 ]
 
 ROOT_URLCONF = 'servicemanager.urls'
@@ -77,16 +78,17 @@ WSGI_APPLICATION = 'servicemanager.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES_LOCAL = {
-      'default': {
-        'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'service_manager',
-        'USER': 'service_manager',
-        'PASSWORD': 'AN###thony85',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-    }
-}
+# DATABASES_LOCAL = {
+#       'default': {
+#         'ENGINE': 'django.db.backends.mysql', 
+#         'NAME': 'service_manager',
+#         'USER': 'service_manager',
+#         'PASSWORD': 'AN###thony85',
+#         'HOST': '127.0.0.1',
+#         'PORT': '3306',
+#     }
+# }
+
 DATABASES = {
       'default': {
         'ENGINE': 'django.db.backends.mysql', 
