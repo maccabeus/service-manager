@@ -1,110 +1,117 @@
-# React Store Manager 
-A simple store manager. Uses `pullstte` and `localforage` for store and persistent store respectively.
+# Schedule Manager Server
+A Simple work order schedule management application server.  This application utilizes `Django` aplication framework and `MYSQL` database. 
+
+The final application contains additional tables and fields  not specific in the specifications. Please see the `service_manager.sql` in the root folder of the application for the `database schemas`.
+
 
 ## Getting Started
+To get the application up and running there are some few things you will need to do. Ensure that you have at least 
+``` 
+Python 3.8
+``` 
+installed on your computer.  See the details below for setting up the application using both `Docker` and `Django-admin`
 
-### Npm
+
+### Docker
+To create a docker image of the application using docker compose, do the following from the application root folder:
 
 ``` bash
-$  npm install react-store-manager -save
+$  docker-compose build
 ```
+After a successful build, from the same terminal run the folowing command to start the developemt server:
 
-## Examples
-To import in a react application
-``` es6
-import {StoreManager} from "react-persistent-store-manager";
+``` bash
+$  docker-compose up
+```
+Copy the  development server address `http://0.0.0.0:8000/` from the console and paste.
+
+Open a new browser window and paste. You application should show the default api page with response `API WORKING`. Don't worry. This is the default route. 
+
+### DJANGO ADMIN
+While you can run the application by cerating a docker image, you can also run directly via using the Django Admin. To run, from the application root directory, run the following comand: to activate the virtual enviroment
+
+``` bash
+$ source/venv/bin/activate
 
 ```
-To create a New Store 
+Once the virtual enviroment is activated, move to the app direcotry using:
 
-from version 1.1.0, you must create a store  and pass it to `StoreManager` to read saved values
-
-Create a `store.js` file or you can call it any name like. You can  use 
-more than one store file within your application.
-
-See below on how to create a new `store.js` file:
-
-``` es6 
-/** import the store from **/
-import {Store} from "react-persistent-store-manager"
-
-/** 
- * export a `Stores` object containing all your store definitions
- * Note: you can create multiple store files to handle your state management.
- * 
-*/
-export const Stores = {
-
-/** the user details store */
-UserStore:{   
-userId:null, 
-user: null,
-email: null,
-phone: null,
-userType: null,
-login: false,
-permission:null,
-},
-/** Add any other store definitions here */
-};
-
-/**
- * return all the store our application will use
- * You can  call it `AppStore` any name of your  choice
- * @Note: you will need to use this name when you want to read the store values
- */
-export const AppStore= Store(Stores);
+``` bash
+$ cd servicemanager
 
 ```
 
-To Set and read a store  value
+It is now time to install the application dependencies defined in the `requirements.txt` file. run the following command to 
+install all the required dependencies.
 
-``` es6
-/** import the `StoreManager` **/
-import { StoreManager } from "react-persistent-store-manager";
-
-/** 
- * import the `Stores` and `AppStore` from our store file 
- * If you use a different name in your store file, please use these name.
- * @Note: we need the `Stores` to be able to validate if the store we are reading 
- * is indeed available, since we can have more than one store within a single `store.js` file.
- * 
- * **/
-import { Stores, AppStore } from "./../state/store";
-
-/** 
- * create an instance of the `StoreManager` using the `UserStore` name
- * that we earlier define in our `store.js` file.  
- * */
-const Store = StoreManager(AppStore, Stores, "UserStore");
-
-Store.update("userId", 123);
-Store.update("user","John Doe" );
-Store.update("email", "johndoe@yahoo.com");
-Store.update("phone", "+1xxxxxxxxxx");
-Store.update("userType", "admin");
-Store.update("login", true);
-
-/** read a non persistent store data
- * data will be lost on refresh
- */
-const user= Store.useState("email");
-
-/** 
- * use this async method to get value that will persist
- **/
-const [email, setEmail]= useState(null);
-
-Store.useStateAsync("email").then(value=>{
-setEmail(value)
-});
+``` bash
+$ pip install -r requirements.txt
 
 ```
 
-To run the code
+Finally, run the application server with the following commands:
+``` bash
+$ python manage.py runserver
+
+```
 
 
-## Contributions
+## Local Migrations
+You need to connect the django models to an actial database. Create a new  `mysql` database with the name `service_manager`
 
-I welcome contributions with love 😄😄🌺🌺🎆🎆
+```
+Follow this section only if you are creating a local database for the application. Also remember to update the `DATABASE` settings of the `settings.py` file to reflect this database connection.
+
+```
+
+To migrate models to the database, run the command below:
+``` bash
+$ python manage.py makemigrations
+
+```
+Once completed, tell Django to create this models as database tables.
+
+``` bash
+$ python manage.py migrate 
+
+```
+
+## API Connections
+
+The following API are available within the application. Don't forget to use your local development server path 
+if you are running application locally.
+
+ ### Service API
+ - return the list of available services
+ - [link]https://maccabeus.pythonanywhere.com/service 
+
+ ### Employee API
+ - return the list of available employees
+ - [link]https://maccabeus.pythonanywhere.com/employee 
+  
+ ### Holiday API
+ - return the list of holidays
+ - [link]https://maccabeus.pythonanywhere.com/holiday
+
+ ### WorkOrder API
+ Handles the creation, search, delete, and update of work order schedules. Please follow link for the list of the required parameters and their types.
+
+ #### WorkOrder Add
+ - Adds a new work order
+ - [link]https://maccabeus.pythonanywhere.com/workorder
+
+ #### WorkOrder Search
+ - Search workorder by user `email` of `service id`.
+ - [link]https://maccabeus.pythonanywhere.com/workorder/search
+
+#### WorkOrder Search By Date
+ - Search work orders using the `date range` provided. Will also use `service id` if provided.
+ - [link]https://maccabeus.pythonanywhere.com/workorder/search/date
+
+#### WorkOrder Delete
+ - Delete a work order using the `id` of the request.
+ - [link]https://maccabeus.pythonanywhere.com/workorder/delete
+
+## Live Server
+Please check out the application [server here](https://maccabeus.pythonanywhere.com/)
 
